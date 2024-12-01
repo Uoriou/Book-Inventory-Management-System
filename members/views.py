@@ -7,6 +7,9 @@ from rest_framework import serializers
 from .models import Books
 import json
 from django import forms
+#Testing
+import requests
+
 
 
 # Create your views here
@@ -116,14 +119,12 @@ def add_books(request,name,title,price):
     all_books = Books.objects.all()
     list = []
     books_map = {}
-    #Checking for a duplicate record
+    #Checking for a duplicate record but it is not working
     for i in all_books:
         books_map[i.title] = 1
         if i.title in books_map:
-            print("Oi")
+            print("Ok")
         list.append(i.title)
-    print(list)
-    print(books_map)
     if title in list:
         return HttpResponse("<h1>Title Duplicates found<h1>")
     else:
@@ -131,21 +132,80 @@ def add_books(request,name,title,price):
         books.name = name
         books.title = title
         books.price = price
-        print(books.name)
+        #print(books.name)
         if books.name and books.title:# Try catch error to handle a malicious input
             books.save()
             return HttpResponse(status=status.HTTP_200_OK)
         else:
             return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
-
-def addMultipleBooks():
-    #Call Google API to extract the number of books and then do a batch operation on it 
+#Bulk operation 
+@api_view(['GET','POST'])
+def add_multiple_books(request,number):
+    #Call Google API to extract a number of books and then do a batch operation on it 
     #And add book on each batch 
-    return 0
-
-
-
+    #API key = AIzaSyArBcVO54LmaymPHUZU5-IpHk9t62R7s3I
+    #http://127.0.0.1:8000/members/multiple/10/?q=Python
+    query = request.GET.get('q', '')  # Get the search query from the URL
+    api = requests.get(
+        "https://www.googleapis.com/books/v1/volumes?/q={query}",
+        params={'q':query,'maxResult':number,}
+        
+    )
+    all_data = api.json()
+    
+    try:
+        author_map = {}
+        book_title_list = []
+        book_authors_list = []
+        book_date_list = []
+        book_price_list = []
+        id_list = []
+        for i in range(number):
+            #Need to map every detail to an author id
+            book_item = all_data['items'][i]
+            id = book_item['id']#Treat it as a primary key
+            book_authors = book_item['volumeInfo']['authors']#Its a list already
+            book_title = book_item['volumeInfo']['title']
+            
+            if 'saleInfo' in book_item:
+                book_price = book_item['saleInfo']
+                book_price_list.append(book_price)
+            else:
+                print("sale info not found for:")  
+                print(book_authors) 
+            if 'publishedDate' in book_item['volumeInfo']:
+                book_date = book_item['volumeInfo']['publishedDate']
+                book_date_list.append(book_date)
+            else:
+                print("Published date not found :")
+                print(book_authors)
+                
+            book_title_list.append(book_title)
+            book_authors_list.append(book_authors)
+            id_list.append(id)
+           
+        #print(id_list)
+        #print(book_title_list)
+        #print(book_authors_list)#Nested list and it is a problem
+        #print(book_date_list)
+        #print(book_price_list)
+        
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        
+    #Saving the retrieved data to the models
+    try:
+       #price = 10
+       for i in range(number):
+           add_books(request,book_authors_list[i],book_title_list[i],i)
+    except Exception as err:
+        print(f"Unexpected storing data {err=}, {type(err)=}")   
+    
+    #return JsonResponse(book_item)
+    return HttpResponse("<h1>OK</h1>")
+    
+    
 def update_books(request,id,option,new_record):
     
     all_books = Books.objects.all()
@@ -187,7 +247,7 @@ def delete_books(request,id):
         for i in all_books:
             list.append(i.id)
             print(list)
-        if id not in list:
+        if id not in list: 
             return HttpResponse("<h1>Record not found<h1>") 
         else:
             book_to_del = 0
@@ -209,5 +269,36 @@ def delete_books(request,id):
         
     return render(request, "test.html", {"form": form})
     """
+def delete_multiple_books(request,list):#list == ids 
+    #(?P<student_list>)
+    id_list = list.split(',')#Input list
+    print(id_list)
+
+    all_books = Books.objects.all()
+    id_from_db = []
+    failed = 0
+    try:
+        for i in all_books:
+            id_from_db.append(str(i.id))#Ids already in the db
+        #Return an empty set if the matching is not detected
+        if set(id_from_db) & set(id_list) == set():
+            failed-=1
+            return HttpResponse("<h1>One or more records not found<h1>") 
+        
+    except Exception as record_check_err:
+        print(f"Unexpected checking the data {record_check_err=}, {type(record_check_err)=}")  
+        return HttpResponse("<h1>Data checking failed</h1>")
+    try:
+        if failed != -1:
+            books_to_del = []
+            for i in range(len(id_list)):
+                books_to_del.append(all_books.get(id = id_list[i]))
+                books_to_del[i].delete()
+            return HttpResponse("<h1>Books successfully deleted<h1>")    
+        
+    except Exception as err:
+        print(f"Unexpected deleting data {err=}, {type(err)=}")  
+        return HttpResponse("<h1>Something went wrong</h1>")
+         
     
     

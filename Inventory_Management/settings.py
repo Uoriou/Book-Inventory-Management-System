@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$bi5qsp9v^zj8g4(plxw^r(ew9ul@u!ci(s0fhbd2no=_t88ai'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False #Built in django 404 page
+DEBUG = True #Built in django 404 page
 
 
 ALLOWED_HOSTS = ['*']
