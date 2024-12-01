@@ -7,16 +7,12 @@ from rest_framework import serializers
 from .models import Books
 import json
 from django import forms
-#Testing
 import requests
 
 
 
 # Create your views here
 #This function is mapped to a URL
-#Unit test is compulsory -- >Available in Python Library 
-
-
 #Serializer class to convert any model to JSON format
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,7 +49,6 @@ def filter_author(request,name):
     else:
         return HttpResponse("<h1>Author not found <h1>")
     
-#@api_view(['GET'])  
 def get_books(request):
     books = Books.objects.all()
     serializer = UserSerializer(books,many =True)
@@ -144,7 +139,6 @@ def add_books(request,name,title,price):
 def add_multiple_books(request,number):
     #Call Google API to extract a number of books and then do a batch operation on it 
     #And add book on each batch 
-    #API key = AIzaSyArBcVO54LmaymPHUZU5-IpHk9t62R7s3I
     #http://127.0.0.1:8000/members/multiple/10/?q=Python
     query = request.GET.get('q', '')  # Get the search query from the URL
     api = requests.get(
@@ -269,8 +263,8 @@ def delete_books(request,id):
         
     return render(request, "test.html", {"form": form})
     """
+
 def delete_multiple_books(request,list):#list == ids 
-    #(?P<student_list>)
     id_list = list.split(',')#Input list
     print(id_list)
 
@@ -300,5 +294,5 @@ def delete_multiple_books(request,list):#list == ids
         print(f"Unexpected deleting data {err=}, {type(err)=}")  
         return HttpResponse("<h1>Something went wrong</h1>")
          
-    
+
     
