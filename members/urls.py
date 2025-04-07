@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from django.contrib import admin
 #Mapping of the file path / url on the right side
+#url would look like http://127.0.0.1:8000/members/list/ 
 urlpatterns = [
     #Get 
     path('list/', views.get_books, name='books'),
@@ -16,6 +17,7 @@ urlpatterns = [
     #Delete
     path('d/<int:id>/',views.delete_books,name='delete'),
     path('d/<list>/',views.delete_multiple_books,name = 'multiple delete'),
+    path('delall/',views.delete_all,name='delete_all'),
     #Update
     path('list/<int:id>',views.update_books,name='update'),
     path('list/<int:id>/<str:option>/',views.update_books,name='update'),#A option If the title needs to be changed

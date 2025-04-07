@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-#Its like db 
+#It represents the structure of the DB
 class Books(models.Model):
     name = models.CharField(max_length=100)
     title = models.CharField(max_length=100,null=True)
