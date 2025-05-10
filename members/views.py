@@ -127,7 +127,7 @@ def add_multiple_books(request,number):
     book_price_list = []
     id_list = []
     
-    print(len(all_data['items']))
+    #print(len(all_data['items']))
     
     try:    
         for i in range(number):
@@ -163,14 +163,12 @@ def add_multiple_books(request,number):
         for i in range(number):
             print(i)
             add_books(request,"null",book_title_list[i],i)
-        return HttpResponse("<h1>Books added successfully</h1>")
+        return  JsonResponse({"success":"Books added successfully"},status=status.HTTP_200_OK)
     except Exception as err:
         print(f"Unexpected storing data {err=}, {type(err)=}")   
-        return JsonResponse(book_item)
+        return JsonResponse({"error":"Failed"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
    
-    
-    
 def update_books(request,id,option,new_record):
     
     all_books = Books.objects.all()
@@ -213,15 +211,15 @@ def delete_books(request,id):
             list.append(i.id)
             print(list)
         if id not in list: 
-            return HttpResponse("<h1>Record not found<h1>") 
+            return JsonResponse({"error":"No matching records found"},status=status.HTTP_404_NOT_FOUND)
         else:
             book_to_del = 0
             book_to_del = all_books.get(id = id)
             book_to_del.delete()
                 
-            return HttpResponse("<h1>Book successfully deleted<h1>")    
+            return JsonResponse({"success":"Book deleted successfully"},status=status.HTTP_200_OK)
     except:
-        HttpResponse("<h1>Something went wrong</h1>")
+        return JsonResponse({"error":"Failed"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #Also try to delete the books based on the titles
 def delete_multiple_books(request,list):#list == ids 
@@ -237,28 +235,28 @@ def delete_multiple_books(request,list):#list == ids
         #Return an empty set if the matching is not detected
         if set(id_from_db) & set(id_list) == set():
             failed-=1
-            return HttpResponse("<h1>One or more records not found<h1>") 
+            return JsonResponse({"error":"No matching records found"},status=status.HTTP_404_NOT_FOUND) 
         
     except Exception as record_check_err:
         print(f"Unexpected checking the data {record_check_err=}, {type(record_check_err)=}")  
-        return HttpResponse("<h1>Data checking failed</h1>")
+        return JsonResponse({"error":"Failed"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     try:
         if failed != -1:
             books_to_del = []
             for i in range(len(id_list)):
                 books_to_del.append(all_books.get(id = id_list[i]))
                 books_to_del[i].delete()
-            return HttpResponse("<h1>Books successfully deleted<h1>")    
+            return JsonResponse({"success":"Books deleted successfully"},status=status.HTTP_200_OK)  
         
     except Exception as err:
         print(f"Unexpected deleting data {err=}, {type(err)=}")  
-        return HttpResponse("<h1>Something went wrong</h1>")
+        return JsonResponse({"error":"Failed"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
      
 def delete_all(request):
     all_books = Books.objects.all()
     try:
         for i in all_books:
             i.delete()
-        return HttpResponse("<h1>All the books deleted</h1>")
+        return JsonResponse({"success":"All books deleted successfully"},status=status.HTTP_200_OK)
     except:
-        return HttpResponse("<h1>Sorry something went wrong</h1>")
+        return JsonResponse({"error":"Failed"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
