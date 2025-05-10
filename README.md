@@ -8,10 +8,13 @@ To run the BIM system, please ensure that your system meets the following requir
 - Operating System: Windows, macOS, or Linux
 - Docker
 
-## Libraries Used:
+## Library Used:
 
 - Python Django
-- Python Programming language
+- 
+## API Integration:
+
+- Google Book API 
 
 ## Installation Guidline
 
