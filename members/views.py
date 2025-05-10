@@ -32,9 +32,9 @@ def filter_author(request,name):
     print(author)
     if author: 
         serializer = UserSerializer(author,many=True)
-        return HttpResponse(json.dumps(serializer.data),status=status.HTTP_202_ACCEPTED)
+        return JsonResponse(serializer.data,safe=False)
     else:
-        return HttpResponse("<h1>Author not found <h1>")
+        return JsonResponse({"error":"No matching records found"},status=status.HTTP_404_NOT_FOUND)
     
 #http://127.0.0.1:8000/members/list/
 def get_books(request):
@@ -73,15 +73,15 @@ def get_sorted_books(request,option,sort):
                 serialized = UserSerializer(sorted_books,many=True)
                 return JsonResponse(serialized.data,safe=False) 
             else:
-                return HttpResponse('<h1>Invalid Option Selected</h1>')
+                return JsonResponse({"error":"Invalid option"},status=status.HTTP_400_BAD_REQUEST)
           
         except:
-            HttpResponse('<h1>Invalid option Selected</h1>') 
+            return JsonResponse({"error":"Invalid option"},status=status.HTTP_400_BAD_REQUEST)
     
     except:
-       return HttpResponse('<h1>Something went wrong</h1>') 
-   
-    return HttpResponse('<h1></h1>') 
+        print("Error in sorting")
+        return JsonResponse({"error":"Failed"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     
 
 def add_books(request,name,title,price):
@@ -92,7 +92,7 @@ def add_books(request,name,title,price):
     for i in all_books:
         list.append(i.title)
         if title in list:
-            return HttpResponse("<h1>Title duplicates found<h1>")
+            return JsonResponse({"error":"Book already exists"},status=status.HTTP_400_BAD_REQUEST)
     else:
         books = Books()
         books.name = name
@@ -101,9 +101,9 @@ def add_books(request,name,title,price):
         #print(books.name)
         if books.name and books.title:# Try catch error to handle a malicious input
             books.save()
-            return HttpResponse(status=status.HTTP_200_OK)
+            return JsonResponse({"success":"Book added successfully"},status=status.HTTP_200_OK)
         else:
-            return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({"error":"Failed"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #Bulk operation using Google books API 
 #http://127.0.0.1:8000/members/multiple/10/?q=Python
