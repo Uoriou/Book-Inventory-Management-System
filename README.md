@@ -39,8 +39,7 @@ Once the container is up and running, create a superuser:
 ```bash
    docker-compose exec web python manage.py createsuperuser
 ```
-The command will ask for your username and password, which allow you to access Django admin panel.
-
+The command will ask for your username and password, which will allow you to access the Django admin panel.
 
 To stop the container and the application run:
 ```bash
