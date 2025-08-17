@@ -45,3 +45,7 @@ To stop the container and the application run:
 ```bash
     docker-compose down
 ```
+
+## Features 
+
+- Book Content Recommendation (Cosaine Similarity)
