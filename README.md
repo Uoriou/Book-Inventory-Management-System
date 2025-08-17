@@ -22,25 +22,27 @@ To run the BIM system, please ensure that your system meets the following requir
 
 ## Installation Guidline
 
-- Please install Docker 
-- Clone this BIM repository
+- Please install Docker desktop: https://www.docker.com/products/docker-desktop/
+- Make sure to clone this project
 
 ## Run the docker image
 
-Once Docker is installed, build the docker image 
-```bash
-   docker build -t "your-image-name" .
- ```
-Then, run the container
-```bash
-   docker run -p 8000:8000 "your-image-name"
+Once Docker is installed, it is possible to use the .yml file of this project to build the docker image to run the project using this command: 
+```bash 
+    docker compose up -d --build 
 ```
-Alternatively, if there is a docker-compose.yml file, 
-you can build and start all services with a single command:
+
+Make sure to run the project container. 
+
+Once the container is up and running, create a superuser:
+
 ```bash
-   docker compose up --build
- ```
+   docker-compose exec web python manage.py createsuperuser
+```
+The command will ask for your username and password, which allow you to access Django admin panel.
 
-Access the application at ``` `http://127.0.0.1:8000/` ```
 
-To stop the continer press Ctrl+C
+To stop the container and the application run:
+```bash
+    docker compose down
+```
