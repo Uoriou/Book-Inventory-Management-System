@@ -43,5 +43,5 @@ The command will ask for your username and password, which will allow you to acc
 
 To stop the container and the application run:
 ```bash
-    docker compose down
+    docker-compose down
 ```
