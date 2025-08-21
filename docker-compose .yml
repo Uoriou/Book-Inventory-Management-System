@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./Inventory_Management
+    image: book_inventory:latest
+    volumes:
+      - ./Inventory_Management:/app
+    ports:
+      - "8000:8000"
+    #depends_on:
+      #- db
